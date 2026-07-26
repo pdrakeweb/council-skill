@@ -1,0 +1,25 @@
+# build output
+*.skill
+*.zip
+
+# runtime data — logs written by the skill, never committed
+council/data/*
+!council/data/.gitkeep
+
+# logs the skill writes into whatever directory it runs in
+council_log_*.md
+
+# secrets — belt and braces; nothing in this repo should ever need them
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+session.pickle
+cookie_session.json
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
