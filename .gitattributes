@@ -1,0 +1,16 @@
+# Shell scripts must keep LF in the working tree, on every platform.
+# core.autocrlf=true (the Windows default) would otherwise check build.sh out
+# with CRLF, and a `#!/usr/bin/env bash\r` shebang fails on POSIX.
+*.sh text eol=lf
+
+# The skill's own content is read by tooling on Linux containers; keep it LF so
+# a package built on Windows is identical to one built anywhere else.
+*.md text eol=lf
+VERSION text eol=lf
+
+# PowerShell is Windows-side; CRLF is the native convention there.
+*.ps1 text eol=crlf
+
+# Never touch built packages.
+*.skill binary
+*.zip binary
