@@ -43,12 +43,46 @@ Both stamps must match or `build.ps1` refuses to package:
 
 Then `git tag vX.Y.Z`.
 
-## Build
+## Build and deploy
 
 ```powershell
-.\build.ps1          # → council.skill
-.\build.ps1 -Zip     # → council.skill + council.zip
+.\build.ps1              # → council.skill
+.\build.ps1 -Zip         # → council.skill + council.zip
+.\deploy.ps1             # build + copy to <Dropbox>\Skills (keeps 5 backups)
+.\deploy.ps1 -DryRun
 ```
+
+```bash
+./build.sh               # POSIX counterpart; byte-identical archive contents
+./build.sh --zip
+```
+
+`build.ps1`, `build.sh`, and `deploy.ps1` are **shared files** — generic, with
+no per-skill content, and byte-identical to afk-skill's copies. They
+auto-discover the skill directory, so they need no per-repo edits: fix them in
+one repo and copy to the other (and port anything genuinely reusable back to
+claude-skill-skeleton).
+
+`deploy.ps1` runs the build first, so a failed validation aborts the deploy —
+a package that doesn't validate can never reach the shared Dropbox folder. It
+keeps 5 backups because Dropbox syncs deletions too.
+
+Two Windows traps these already handle; don't regress them:
+
+- **`python3` on PATH is usually the Microsoft Store alias stub.** It resolves
+  under `command -v` but exits non-zero telling you to install from the Store.
+  `build.sh` therefore probes each candidate by actually running it
+  (`python3 -c 'import zipfile'`) rather than trusting the name to resolve.
+  `zip` is also absent from a default Git Bash install, hence the fallback
+  chain zip → python → Compress-Archive.
+- **A PowerShell script that falls off its end does not set `$LASTEXITCODE`.**
+  A caller reads a stale value from some earlier native command instead, so
+  `build.ps1` ends with an explicit `exit 0` and `deploy.ps1` resets
+  `$LASTEXITCODE` before invoking it. Without both, deploy refuses good builds.
+
+These are repo-root files, **outside the skill directory**, so changing them
+does not require a version bump — the bump rule above is scoped to commits
+touching `council/`.
 
 ## The contract with afk-skill — do not break silently
 

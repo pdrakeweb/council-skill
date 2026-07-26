@@ -118,15 +118,35 @@ it, since nobody is present to catch a stale premise.
 The skills are independent — `council` works standalone, and `afk` degrades
 gracefully to a flagged best-effort decision if `council` is not installed.
 
-## Install
+## Build and deploy
 
 ```powershell
-.\build.ps1          # → council.skill
-.\build.ps1 -Zip     # → council.skill + council.zip
+.\build.ps1              # → council.skill
+.\build.ps1 -Zip         # → council.skill + council.zip
+.\deploy.ps1             # build, then copy to <Dropbox>\Skills
+.\deploy.ps1 -DryRun     # show what would happen, write nothing
 ```
 
-Upload `council.skill` via **Settings → Capabilities → Skills**, or drop the
-`council/` directory into your Cowork skills directory.
+```bash
+./build.sh               # same, on macOS / Linux / Git Bash
+./build.sh --zip
+```
+
+`build.sh` and `build.ps1` produce **byte-identical archive contents** — same
+entry set, same file bytes — so it doesn't matter which one runs. Both validate
+before packaging and refuse to build on: a folder name that doesn't match the
+frontmatter `name:`, a name breaking Anthropic's rules, an empty or >1024-char
+description, or the two version stamps disagreeing.
+
+`deploy.ps1` runs the build first, so a failed validation aborts the deploy and
+a broken package can never reach the shared folder. It resolves Dropbox from
+`%LOCALAPPDATA%\Dropbox\info.json` (so it survives Dropbox moving), and keeps
+the last 5 packages in `Skills\.backups\` — Dropbox syncs deletions too, so
+overwriting a good package with a bad one propagates everywhere, and a local
+backup is the fast way back. Override with `-Destination`.
+
+Then upload `council.skill` via **Settings → Capabilities → Skills**, or drop
+the `council/` directory into your Cowork skills directory.
 
 ## Honest limitation
 

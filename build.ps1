@@ -100,8 +100,10 @@ if (Test-Path $dataDir) {
 } else {
     New-Item $dataDir -ItemType Directory | Out-Null
 }
-"This directory is created at runtime (logs). Ships empty." |
-    Set-Content -Path (Join-Path $dataDir ".gitkeep")
+# LF, not Set-Content's CRLF, so this file is byte-identical to build.sh's.
+[System.IO.File]::WriteAllText(
+    (Join-Path $dataDir ".gitkeep"),
+    "This directory is created at runtime (logs). Ships empty.`n")
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $dest = (Join-Path (Resolve-Path .).Path $outName)
@@ -113,3 +115,8 @@ if ($Zip) { Copy-Item $outName "$skillDir.zip" -Force }
 $size = (Get-Item $outName).Length
 Write-Host "Built: $outName v$mdVer ($size bytes)"
 if ($Zip) { Write-Host "Built: $skillDir.zip (copy)" }
+
+# Explicit success code. Without this, a PowerShell script that falls off the
+# end leaves $LASTEXITCODE at whatever a previous native command set, so a
+# caller checking it (deploy.ps1) can read a stale failure.
+exit 0
