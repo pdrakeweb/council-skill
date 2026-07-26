@@ -3,6 +3,12 @@
 A full council, from a vague prompt to a logged verdict. Use this to calibrate
 brief length, summary length, and how blunt the verdict should be.
 
+> Run as `panel: classic · rounds: 1 · research: skipped` — the question turned
+> entirely on internal facts (this team, this cluster, these incidents), so the
+> research heuristics correctly declined to run. The `--rounds 2` default was
+> suppressed here to keep the example readable; §"What round 2 would have
+> added" at the end shows what was lost by doing so, and why 2 is the default.
+
 ---
 
 ## The prompt
@@ -173,6 +179,33 @@ HOLLOW SELF-COUNTERS: none — all three named real weaknesses.
 ```
 
 ---
+
+## What round 2 would have added
+
+Round 1 left one exchange unresolved, and it is the kind cross-examination is
+for. The Skeptic asserted that `acks_late=True` would fix the incidents without
+any migration. Nobody answered it — the Advocate never saw the claim, and the
+Pragmatist built a plan on top of a premise the Skeptic had just questioned.
+
+In round 2 the Advocate receives that claim verbatim and has to either rebut it
+("`acks_late` re-delivers on restart but does not make the enqueue atomic with
+the business write, so the double-write window stays open") or concede it. Both
+outcomes are worth more than the Judge inferring the answer:
+
+- A **rebuttal** would have promoted the verdict from MEDIUM toward HIGH, since
+  the cheap-alternative question — the thing that made it MEDIUM — would be
+  settled inside the debate rather than deferred to a config read.
+- A **concession** would have flipped the recommended action entirely: not "fix
+  3 jobs", but "fix one config line and re-evaluate".
+
+That is why `--rounds 2` is the default. Round 1 collects positions; round 2 is
+where a claim actually gets tested. Drop to `--rounds 1` only when a queue is
+waiting on the answer.
+
+Note also what round 2 would **not** have done: neither seat could have
+established whether `acks_late` is currently set. That is a NEED, and it stays a
+NEED however many rounds run. Rounds surface disagreement; they do not
+manufacture missing facts.
 
 ## What this example is calibrated to show
 

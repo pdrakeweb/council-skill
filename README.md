@@ -3,50 +3,97 @@
 A Cowork / Claude Code skill that convenes a **council of sub-agents** to debate
 a hard question and return a verdict with an explicit confidence level.
 
-Three debaters run **in parallel with clean contexts** — each sees only the
-question brief and its own role card, never your session's momentum toward a
-preferred answer. A Judge then reads all three (and nothing else) and rules.
+Debaters open **in parallel with clean contexts** — each sees only the question
+brief and its own role card, never your session's momentum toward a preferred
+answer — then **cross-examine each other**. A Judge reads the whole transcript
+(and nothing else) and rules.
 
-| Seat | Mandate |
-|------|---------|
-| **Advocate** | Argues for the most promising option, by mechanism |
-| **Skeptic** | Attacks assumptions, names failure modes with triggers |
-| **Pragmatist** | Costs the options against real constraints; says what ships |
-| **Judge** | Synthesizes, rules, assigns `high`/`medium`/`low` confidence |
+## Panels
+
+Pick by the *shape* of the question. The choice is a real fork: `classic`
+produces a **decision**, `dmad` produces a **reframing**, `review` produces a
+**findings list**.
+
+| Panel | Seats | Use for |
+|---|---|---|
+| **`classic`** *(default)* | Advocate, Skeptic, Pragmatist | "Should we do X?" — choosing between options |
+| **`dmad`** | Contrarian, First-Principles, Analogist, Outsider, Executor | Open or strategic questions where the *framing* may be wrong. Five reasoning **methods**, not five opinions |
+| **`review`** | Security Auditor, Correctness Hawk, Feasibility Analyst, Clarity Editor | Reviewing a concrete artifact — a diff, a plan, a PR |
+| custom | `--seats "a,b,c"` | Any mix of cards. A Judge is always added |
+
+More seats is not better. Five seats on a two-option question mostly produces
+restatement — prefer `classic` and spend the tokens on `--rounds 3`.
 
 ## Usage
 
 ```
-/council <question>
-/council <question> --rounds 2
-/council <question> --quiet
+/council <question>                              # classic, 2 rounds, auto-research
+/council <question> --panel dmad --rounds 3
+/council <question> --research
+/council <question> --seats "advocate,skeptic,security,pragmatist"
+/council <question> --rounds 1 --quiet
 ```
 
-- `--rounds 2` gives the debaters a rebuttal round before the Judge rules;
-  concessions are recorded as first-class output.
-- `--quiet` prints the verdict block only.
+| Flag | Default | Effect |
+|---|---|---|
+| `--panel <name>` | `classic` | Which seats debate |
+| `--rounds N` | **2** | 1 = openings · 2 = + cross-examination · 3 = + closings |
+| `--research` / `--no-research` | auto | Force or suppress the web-research phase |
+| `--seats "a,b,c"` | — | Custom seat list (2–6) |
+| `--quiet` | off | Verdict block only |
 
-Every council is appended to `council_log_YYYY-MM-DD.md` in the working
-directory, **before** the verdict is acted on.
+**Two rounds by default**, because round 1 only collects positions — round 2 is
+where a claim actually gets tested. A seat must quote a specific claim from
+another seat and either rebut or **concede** it; concessions are recorded as
+first-class output. Drop to `--rounds 1` only when something is waiting.
+
+## Research phase
+
+Debaters reason from what they're given, which on fact-dependent questions is a
+liability: a confident council built on stale recollection is *worse* than no
+council, because the debate launders the error into a verdict.
+
+So a **Researcher** runs first — deep web search, several framings, following
+into primary sources (release notes, advisories, official docs, the repo
+itself) — and returns a cited evidence pack that every seat then argues over.
+It must separate **fact from inference**, **date everything**, and **report what
+it could not find** (absence of evidence is a finding: "no CVEs since 2024" and
+"I couldn't find CVE data" point opposite ways).
+
+Auto-runs when the question turns on library/tool status, pricing, benchmarks,
+advisories, deprecations, or any checkable load-bearing claim. Skipped for
+purely internal or purely value questions — and it says which, rather than
+silently omitting it.
+
+Then two rules are enforced: **debaters may cite only the evidence pack and the
+brief**, and a debater needing an absent fact writes `NEED: <fact>` rather than
+inventing one. The Judge collects every `NEED:` line — they drive the confidence
+level and become the "would change this verdict" list.
 
 ## Output
 
 ```
 ## Council verdict — <question>
+`panel: classic · rounds: 2 · research: ran (7 findings)`
 
 **Advocate** (medium): ...
 **Skeptic** (high): ...
 **Pragmatist** (high): ...
+**Round 2 movement:** Skeptic conceded the pool concern is bounded at current volume
+**Open questions:** actual p99 job duration under load
 
 ### Verdict — confidence: MEDIUM
 ...
 
 **Recommended action:** ...
 **Would change this verdict:** ...
+**Evidence:** ...
 ```
 
-See [`council/references/examples.md`](council/references/examples.md) for a
-full worked council, brief to logged verdict.
+Every council is appended to `council_log_YYYY-MM-DD.md`, **before** the verdict
+is acted on. See
+[`council/references/examples.md`](council/references/examples.md) for a full
+worked council, brief to logged verdict.
 
 ## Called from the `afk` skill
 
@@ -59,7 +106,15 @@ machine-readable last line:
 COUNCIL_VERDICT: <option> | CONFIDENCE: <high|medium|low>
 ```
 
+plus `COUNCIL_NEEDS: <missing facts, or none>`, which becomes the "questions the
+council couldn't answer" section of your return briefing.
+
 A `low`-confidence verdict tells `afk` to escalate and defer rather than act.
+In that mode the council never asks a clarifying question — there is nobody
+there to answer, and asking is exactly how an AFK session stalls. The research
+phase still runs on its normal heuristics: an AFK council is *more* dependent on
+it, since nobody is present to catch a stale premise.
+
 The skills are independent — `council` works standalone, and `afk` degrades
 gracefully to a flagged best-effort decision if `council` is not installed.
 
