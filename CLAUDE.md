@@ -48,8 +48,9 @@ Then `git tag vX.Y.Z`.
 ```powershell
 .\build.ps1              # → council.skill
 .\build.ps1 -Zip         # → council.skill + council.zip
-.\deploy.ps1             # build + copy to <Dropbox>\Skills (keeps 5 backups)
-.\deploy.ps1 -DryRun
+.\deploy.ps1             # INSTALL into Claude Desktop (skeleton's installer)
+.\publish.ps1            # build + copy to <Dropbox>\Skills (keeps 5 backups)
+.\deploy.ps1 -DryRun     # either script supports -DryRun
 ```
 
 ```bash
@@ -57,15 +58,28 @@ Then `git tag vX.Y.Z`.
 ./build.sh --zip
 ```
 
-`build.ps1`, `build.sh`, and `deploy.ps1` are **shared files** — generic, with
-no per-skill content, and byte-identical to afk-skill's copies. They
-auto-discover the skill directory, so they need no per-repo edits: fix them in
-one repo and copy to the other (and port anything genuinely reusable back to
-claude-skill-skeleton).
+**`deploy.ps1` installs; `publish.ps1` publishes.** Do not conflate them — an
+earlier revision of this repo used the name `deploy.ps1` for the Dropbox copy,
+which collides with the skeleton's long-standing meaning and would confuse
+anyone moving between skill repos on this machine.
 
-`deploy.ps1` runs the build first, so a failed validation aborts the deploy —
-a package that doesn't validate can never reach the shared Dropbox folder. It
-keeps 5 backups because Dropbox syncs deletions too.
+- `deploy.ps1` is the **skeleton's file, adopted verbatim** except for one
+  documented divergence (below). It installs into Claude Desktop's nested
+  `skills-plugin\<guid>\<guid>\skills\` layout, mirrors with robocopy `/MIR`
+  **excluding `data\`**, keeps 5 backups, and registers the skill in
+  `manifest.json`. **Claude Desktop only loads skills listed in that manifest**
+  — a bare file copy is invisible, which is the single most common way a
+  "deployed" skill silently fails to appear.
+- `publish.ps1` copies the built package to `<Dropbox>\Skills`.
+
+**Divergence in `deploy.ps1`:** the skeleton's `Resolve-BuildOutput` looks for
+`<name>.zip`; this repo's `build.ps1` emits `<name>.skill` by default. The
+adopted copy accepts either. That is a candidate to port back to
+claude-skill-skeleton — do it if the skeleton ever grows `.skill` output.
+
+`build.ps1`, `build.sh`, `deploy.ps1`, and `publish.ps1` are all **shared
+files** — generic, no per-skill content, byte-identical to afk-skill's copies.
+Fix them in one repo and copy to the other.
 
 Two Windows traps these already handle; don't regress them:
 

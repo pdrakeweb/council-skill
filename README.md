@@ -123,9 +123,18 @@ gracefully to a flagged best-effort decision if `council` is not installed.
 ```powershell
 .\build.ps1              # → council.skill
 .\build.ps1 -Zip         # → council.skill + council.zip
-.\deploy.ps1             # build, then copy to <Dropbox>\Skills
-.\deploy.ps1 -DryRun     # show what would happen, write nothing
+.\deploy.ps1             # INSTALL into Claude Desktop on this machine
+.\publish.ps1            # build, then copy to <Dropbox>\Skills
+.\deploy.ps1  -DryRun    # either script; show what would happen, write nothing
+.\publish.ps1 -DryRun
 ```
+
+The two verbs are different targets and it matters which you want:
+
+| Script | Target | Use when |
+|---|---|---|
+| `deploy.ps1` | Claude Desktop's local skills-plugin dir on **this machine** | You want to *use* the skill here |
+| `publish.ps1` | `<Dropbox>\Skills` | You want the package available on your other machines, or to upload it |
 
 ```bash
 ./build.sh               # same, on macOS / Linux / Git Bash
@@ -138,15 +147,25 @@ before packaging and refuse to build on: a folder name that doesn't match the
 frontmatter `name:`, a name breaking Anthropic's rules, an empty or >1024-char
 description, or the two version stamps disagreeing.
 
-`deploy.ps1` runs the build first, so a failed validation aborts the deploy and
-a broken package can never reach the shared folder. It resolves Dropbox from
-`%LOCALAPPDATA%\Dropbox\info.json` (so it survives Dropbox moving), and keeps
-the last 5 packages in `Skills\.backups\` — Dropbox syncs deletions too, so
-overwriting a good package with a bad one propagates everywhere, and a local
-backup is the fast way back. Override with `-Destination`.
+Both scripts run the build first, so a failed validation aborts them and a
+package that doesn't validate never reaches Claude Desktop or the shared folder.
 
-Then upload `council.skill` via **Settings → Capabilities → Skills**, or drop
-the `council/` directory into your Cowork skills directory.
+`deploy.ps1` is the **skeleton's** installer, adopted here: it auto-detects the
+nested `skills-plugin\<guid>\<guid>\skills\` layout, mirrors with robocopy
+`/MIR` **excluding `data\`** so any runtime state survives a redeploy, keeps 5
+backups, and — critically — registers the skill in `manifest.json`. Claude
+Desktop only loads skills listed there, so a bare file copy is invisible.
+**Restart Claude Desktop afterward.**
+
+`publish.ps1` resolves Dropbox from `%LOCALAPPDATA%\Dropbox\info.json` (so it
+survives Dropbox moving) and keeps the last 5 packages in `Skills\.backups\` —
+Dropbox syncs deletions too, so overwriting a good package with a bad one
+propagates everywhere, and a local backup is the fast way back. Override with
+`-Destination`.
+
+For web and mobile, upload `council.skill` via **Settings → Capabilities →
+Skills** — that creates an account-synced copy which then takes precedence over
+local files everywhere, including desktop.
 
 ## Honest limitation
 
