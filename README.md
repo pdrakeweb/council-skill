@@ -118,6 +118,26 @@ it, since nobody is present to catch a stale premise.
 The skills are independent — `council` works standalone, and `afk` degrades
 gracefully to a flagged best-effort decision if `council` is not installed.
 
+## Install
+
+**As a Claude Code plugin (one command):**
+
+```
+/plugin marketplace add pdrakeweb/council-skill
+/plugin install council@pdrakeweb-council
+```
+
+**As a Claude Desktop / claude.ai skill:** build the package and upload it via
+**Settings → Capabilities → Skills → Upload a skill**:
+
+```bash
+./build.sh --zip          # Windows: .\build.ps1 -Zip
+```
+
+The plugin manifest lives in `.claude-plugin/marketplace.json` and points at `./council`, so the
+skill stays where the build scripts expect it — `build.sh`/`build.ps1` auto-discover the single
+`SKILL.md`-bearing directory one level down, and moving it under `skills/` would break them.
+
 ## Build and deploy
 
 ```powershell
