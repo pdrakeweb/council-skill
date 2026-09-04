@@ -1,6 +1,7 @@
 ---
 name: "council"
-version: "0.2.0"
+version: "0.2.1"
+license: MIT
 description: >
   Convene a council of sub-agents that debate a hard question across multiple
   rounds and return a verdict with a confidence level. Selectable panels:
@@ -10,11 +11,18 @@ description: >
   other; a Judge rules with high/medium/low confidence and a recommended
   action. Includes an optional deep web-research phase that builds a cited
   evidence pack before the debate, so the panel argues over facts rather than
-  recollection. Use on "council this", "convene the council", "debate this",
-  "argue both sides", "red-team this", "stress-test this decision", "get
-  multiple opinions", "what would a skeptic say", or any architectural,
-  strategic, or high-consequence choice. Also invoked by the afk skill for
-  decisions and questions arising while the user is away.
+  recollection. Do NOT use for questions with a single verifiable answer, for
+  decisions that are cheap to reverse, or as a substitute for reading the code
+  or running a test — a council debates a judgement call, it does not
+  establish a fact.
+when_to_use: >
+  Use on "council this", "convene the council", "debate this", "argue both
+  sides", "red-team this", "stress-test this decision", "get multiple
+  opinions", "what would a skeptic say", or any architectural, strategic, or
+  high-consequence choice — roughly, anything that would earn an ADR. Also
+  invoked by the afk skill for decisions and questions arising while the user
+  is away, and by the android-app-development skill for choices a non-expert
+  user cannot evaluate themselves.
 ---
 
 # Council
