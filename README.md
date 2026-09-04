@@ -138,6 +138,19 @@ The plugin manifest lives in `.claude-plugin/marketplace.json` and points at `./
 skill stays where the build scripts expect it — `build.sh`/`build.ps1` auto-discover the single
 `SKILL.md`-bearing directory one level down, and moving it under `skills/` would break them.
 
+## Releasing
+
+Tag it; CI does the rest.
+
+```bash
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+The `release` workflow builds the package — which is also the validation, since `build.sh` refuses
+to package on a naming, description or version-stamp problem — **refuses to publish if the tag
+disagrees with the version stamps**, and attaches `council.skill` and `council.zip` to a GitHub
+Release. It can also be run manually from the Actions tab.
+
 ## Build and deploy
 
 ```powershell
