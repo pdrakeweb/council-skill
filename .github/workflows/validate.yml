@@ -1,0 +1,53 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+
+      - name: Lint shell
+        run: shellcheck -S warning build.sh
+
+      # build.sh validates naming, description length and both version stamps,
+      # then packages. If it builds, the package is well-formed.
+      - name: Build
+        run: bash build.sh --zip
+
+      - name: Check the plugin manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, sys
+          m = json.load(open(".claude-plugin/marketplace.json"))
+          p = m["plugins"][0]
+          for s in p["skills"]:
+              path = os.path.join(s, "SKILL.md")
+              assert os.path.isfile(path), f"declared skill has no SKILL.md: {path}"
+              print(f"ok  {path}")
+          print(f"ok  /plugin install {p['name']}@{m['name']}")
+          PY
+
+      # The package must carry the skill folder as its single top-level entry,
+      # or the claude.ai upload rejects it.
+      - name: Check the archive layout
+        run: |
+          set -euo pipefail
+          top=$(python3 -c "
+          import zipfile
+          names = zipfile.ZipFile('council.zip').namelist()
+          print(sorted({n.split('/')[0] for n in names}))")
+          echo "top-level entries: $top"
+          [ "$top" = "['council']" ] || { echo "unexpected archive layout" >&2; exit 1; }
