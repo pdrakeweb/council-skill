@@ -1,0 +1,29 @@
+{
+  "name": "pdrakeweb-council",
+  "owner": {
+    "name": "Peter Drake"
+  },
+  "metadata": {
+    "description": "A structured multi-agent debate skill: debaters reason in clean parallel contexts, cross-examine each other, and a Judge rules with an explicit confidence level.",
+    "version": "0.2.0"
+  },
+  "plugins": [
+    {
+      "name": "council",
+      "description": "Convene a council of sub-agents that debate a hard question across multiple rounds and return a verdict with a confidence level. Selectable panels: classic (Advocate / Skeptic / Pragmatist), dmad (five diverse reasoning methods), review (security, correctness, feasibility, clarity), or custom seats. Includes an optional deep web-research phase that builds a cited evidence pack before the debate, so the panel argues over facts rather than recollection.",
+      "author": {
+        "name": "Peter Drake"
+      },
+      "category": "development",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./council"
+      ],
+      "homepage": "https://github.com/pdrakeweb/council-skill",
+      "repository": "https://github.com/pdrakeweb/council-skill",
+      "license": "MIT",
+      "keywords": ["debate", "decision-making", "multi-agent", "review", "red-team", "research"]
+    }
+  ]
+}
