@@ -3,11 +3,11 @@
     Build and deploy this skill into Claude Desktop's local skills-plugin dir.
 
 .DESCRIPTION
-    SHARED SKELETON FILE — generic; no per-skill edits needed.
+    SHARED SKELETON FILE - generic; no per-skill edits needed.
 
     1. Runs build.ps1 (auto-discovers the skill, validates name + version).
     2. Extracts the zip and reads the skill name from SKILL.md frontmatter.
-    3. Locates the Claude Desktop skills-plugin target — auto-detects the
+    3. Locates the Claude Desktop skills-plugin target - auto-detects the
        nested <outer-guid>\<inner-guid>\skills\<skill-name>\ layout; falls
        back to %APPDATA%\Claude\local-agent-mode-sessions\skills-plugin\<name>\.
     4. Backs up the existing deployment (keeps last 5).
@@ -72,7 +72,7 @@ function Resolve-BuildOutput {
     param([string]$SkillDirName)
     # DIVERGENCE FROM SKELETON: this repo's build.ps1 emits <name>.skill by
     # default (the Cowork package extension) and <name>.zip only with -Zip.
-    # Accept either — both are ordinary zip archives. Candidate for porting
+    # Accept either - both are ordinary zip archives. Candidate for porting
     # back to the skeleton.
     $zip = Join-Path $script:ProjectRoot "$SkillDirName.skill"
     if (-not (Test-Path -LiteralPath $zip)) {
@@ -138,7 +138,7 @@ function Get-SkillDescription {
 function Sync-SkillManifest {
     <#
       Claude Desktop only loads skills listed in manifest.json (sibling of the
-      skills\ directory) — files alone are invisible. This registers the skill
+      skills\ directory) - files alone are invisible. This registers the skill
       when missing and keeps the manifest description in sync with SKILL.md.
       A .bak of the manifest is written before any change.
     #>
@@ -146,7 +146,7 @@ function Sync-SkillManifest {
     $skillsDir = Split-Path -Parent $TargetDir
     $manifestPath = Join-Path (Split-Path -Parent $skillsDir) 'manifest.json'
     if (-not (Test-Path -LiteralPath $manifestPath)) {
-        Write-Warn "No manifest.json next to the skills dir — Claude Desktop will NOT see this skill."
+        Write-Warn "No manifest.json next to the skills dir - Claude Desktop will NOT see this skill."
         Write-Warn "Install it once via Claude Desktop Settings > Capabilities > Skills (upload the zip)."
         return 'no-manifest'
     }
@@ -163,7 +163,7 @@ function Sync-SkillManifest {
         # Server-registered? A skillId NOT prefixed skill_local_ means this
         # skill was uploaded via claude.ai Settings and is account-synced
         # (web + mobile + desktop all load the SERVER copy). Local file edits
-        # do NOT change what loads — the user must RE-UPLOAD the zip.
+        # do NOT change what loads - the user must RE-UPLOAD the zip.
         $script:ServerRegistered = ($entry.skillId -notlike 'skill_local_*')
         if ($Description -and $entry.description -ne $Description) {
             Copy-Item -LiteralPath $manifestPath "$manifestPath.bak" -Force
@@ -185,7 +185,7 @@ function Sync-SkillManifest {
         $manifest.skills = @($manifest.skills) + @($new)
         $changed = $true
         $action = 'registered'
-        Write-Ok "Registered '$SkillName' in manifest.json (was missing — this is why a bare file copy is invisible)."
+        Write-Ok "Registered '$SkillName' in manifest.json (was missing - this is why a bare file copy is invisible)."
     }
     if ($changed) {
         $manifest.lastUpdated = [int64]([datetimeoffset](Get-Date)).ToUnixTimeMilliseconds()
@@ -308,7 +308,7 @@ function Restart-ClaudeDesktop {
 try {
     Write-Host ""
     Write-Host "=== Skill Deploy ===" -ForegroundColor Magenta
-    if ($DryRun) { Write-Host "    (DRY RUN — no changes will be written)" -ForegroundColor Yellow }
+    if ($DryRun) { Write-Host "    (DRY RUN - no changes will be written)" -ForegroundColor Yellow }
     Write-Host ""
 
     $skillDirName = Get-SkillDirName
@@ -338,22 +338,22 @@ try {
     Write-Host ("  Files removed  : {0}" -f $mirror.Removed)
     Write-Host ("  Manifest       : {0}" -f $manifestAction)
     Write-Host ("  Backup         : {0}" -f $(if ($backupPath) { $backupPath } else { '(none)' }))
-    Write-Host ("  Server-synced  : {0}" -f $(if ($script:ServerRegistered) { 'YES — re-upload required (see below)' } else { 'no (local-only)' }))
+    Write-Host ("  Server-synced  : {0}" -f $(if ($script:ServerRegistered) { 'YES - re-upload required (see below)' } else { 'no (local-only)' }))
     Write-Host ("  Elapsed        : {0:N1}s" -f $elapsed.TotalSeconds)
     Write-Host ""
     if ($DryRun) {
         Write-Host "Dry run complete." -ForegroundColor Yellow
     } elseif ($script:ServerRegistered) {
-        Write-Host "⚠  THIS SKILL IS ACCOUNT/SERVER-SYNCED — local files are NOT what loads." -ForegroundColor Yellow
+        Write-Host "!  THIS SKILL IS ACCOUNT/SERVER-SYNCED - local files are NOT what loads." -ForegroundColor Yellow
         Write-Host "   It was uploaded via claude.ai Settings, so web + mobile + desktop all" -ForegroundColor Yellow
         Write-Host "   load the SERVER copy. There is NO API to update it; you must re-upload:" -ForegroundColor Yellow
-        Write-Host "     1. claude.ai (or Desktop) → Settings → Capabilities → Skills" -ForegroundColor Yellow
+        Write-Host "     1. claude.ai (or Desktop) -> Settings -> Capabilities -> Skills" -ForegroundColor Yellow
         Write-Host "     2. Remove the old '$skillName', then Upload a skill:" -ForegroundColor Yellow
         Write-Host "        $zipPath" -ForegroundColor Cyan
         Write-Host "   This updates ALL your devices (including phone). Restart afterward." -ForegroundColor Yellow
     } else {
         Write-Host "Deploy complete. Restart Claude Desktop to pick up changes." -ForegroundColor Green
-        Write-Host "(For web/mobile access, upload $skillDirName.zip via Settings → Capabilities → Skills.)" -ForegroundColor Gray
+        Write-Host "(For web/mobile access, upload $skillDirName.zip via Settings -> Capabilities -> Skills.)" -ForegroundColor Gray
     }
 }
 catch {

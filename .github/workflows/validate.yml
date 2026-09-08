@@ -21,6 +21,28 @@ jobs:
       - name: Lint shell
         run: shellcheck -S warning build.sh
 
+      # Windows PowerShell 5.1 reads a BOM-less .ps1 as the ANSI codepage, not
+      # UTF-8. An em dash there decodes to a trailing right curly quote, and
+      # PowerShell treats curly quotes as real string delimiters -- so the
+      # string ends early and the file stops parsing, with errors that point at
+      # unrelated lines and never name the encoding. ASCII-only is immune to
+      # how the file is decoded, where a BOM is invisible state that an editor
+      # can silently drop.
+      - name: PowerShell scripts are ASCII-only
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in ./*.ps1; do
+            [ -e "$f" ] || continue
+            if LC_ALL=C grep -nP '[^\x00-\x7F]' "$f"; then
+              echo "^^ non-ASCII in $f breaks it under Windows PowerShell 5.1" >&2
+              fail=1
+            else
+              echo "ok  ASCII-only: $f"
+            fi
+          done
+          exit $fail
+
       # build.sh validates naming, description length and both version stamps,
       # then packages. If it builds, the package is well-formed.
       - name: Build

@@ -6,8 +6,8 @@
     Derived from claude-skill-skeleton's build.ps1, with one deliberate
     divergence: this is a pure-Markdown skill with no Python CLI, so the second
     version stamp lives in <skill>/VERSION instead of scripts/skill_schema.py.
-    Everything else — auto-discovery of the SKILL.md-bearing directory, name /
-    description / version validation, empty data/ — follows the skeleton so
+    Everything else - auto-discovery of the SKILL.md-bearing directory, name /
+    description / version validation, empty data/ - follows the skeleton so
     future skeleton improvements merge cleanly.
 
     1. Discovers the skill dir (exactly one top-level dir containing SKILL.md).

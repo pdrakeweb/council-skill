@@ -3,12 +3,12 @@
     Build the skill and deploy the package to the Dropbox skills directory.
 
 .DESCRIPTION
-    SHARED FILE — generic on purpose; it auto-discovers the single
+    SHARED FILE - generic on purpose; it auto-discovers the single
     SKILL.md-bearing directory via build.ps1, so it needs no per-skill edits and
     can be copied verbatim between skill repos.
 
     1. Runs build.ps1 (which validates name, description, and both version
-       stamps — a failed validation aborts the deploy, so a broken package can
+       stamps - a failed validation aborts the deploy, so a broken package can
        never reach the shared folder).
     2. Resolves the Dropbox skills directory (see -Destination).
     3. Backs up the currently-deployed package, keeping the most recent 5.
@@ -65,7 +65,7 @@ if (-not (Test-Path $Destination)) {
 # refuse to deploy a perfectly good build.
 $global:LASTEXITCODE = 0
 & (Join-Path $PSScriptRoot "build.ps1")
-if ($LASTEXITCODE -ne 0) { Write-Error "Build failed — nothing deployed."; exit 1 }
+if ($LASTEXITCODE -ne 0) { Write-Error "Build failed - nothing deployed."; exit 1 }
 
 $pkg = Get-ChildItem -Path $PSScriptRoot -Filter *.skill | Select-Object -First 1
 if (-not $pkg) { Write-Error "No .skill package found after build."; exit 1 }
