@@ -47,6 +47,12 @@ CONSTRAINTS (facts, not preferences)
 Note what is *not* in the brief: any hint that the session already leaned
 toward pgmq. That omission is the whole point.
 
+## Step 1 — Research: skipped
+
+The question turned entirely on internal facts, so the research heuristics
+declined to run (see the note at the top). No evidence pack; the debaters
+argue from the brief alone.
+
 ## Step 2 — Openings (parallel, clean contexts)
 
 **Advocate** returned:
@@ -123,6 +129,16 @@ NEED: none
 CONFIDENCE: high
 ```
 
+## Step 3 — Round 2, cross-examination: not run
+
+This example ran `--rounds 1` to stay readable, so there was no
+cross-examination and no round-2 movement to record. §"What round 2 would
+have added" at the end works through what that cost.
+
+## Step 4 — Round 3, closings: not run
+
+Closings exist only under `--rounds 3`.
+
 ## Step 5 — Judge
 
 ```
@@ -166,6 +182,14 @@ table entirely, revisit C despite the staffing cost).
 
 HOLLOW SELF-COUNTERS: none — all three named real weaknesses.
 ```
+
+## Step 6 — Report
+
+The report to the user is the Step 6 verdict block assembled from the Judge's
+output above: one line per seat, the round-2 movement (here: none — round 2
+did not run), the open NEED, then the verdict, recommended action, and
+would-change lines. It is not reproduced here; the Judge's output is its
+source.
 
 ## Step 7 — Log entry
 
