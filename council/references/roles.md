@@ -229,7 +229,7 @@ CONFIDENCE: high | medium | low
 ```
 
 The Judge does not pick an option for a review panel. It rules a disposition:
-**DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. List blocking findings first, and every claimed mitigation with its basis.
+**DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. A finding its own seat withdrew in round 2, or that the Judge rules refuted on the record, is closed: it is neither mitigated nor unmitigated, it does not block, and the Judge lists it as closed with its basis. List blocking findings first, and every claimed mitigation with its basis. Record every claimed mitigation on the verdict's `MITIGATIONS:` line (the Judge card's output, below); a mitigation mentioned anywhere else does not count.
 
 ## Security Auditor
 
@@ -386,10 +386,9 @@ Do this in order:
    verdict" list.
 5. RULE. Pick an option. "It depends" is acceptable ONLY if you name the
    decisive variable and how to resolve it. EXCEPTION — review panel: rule a
-   disposition instead, using the disposition rule stated in the review panel
-   section of this file (DO NOT SHIP / SHIP WITH FIXES / SHIP by worst
-   unmitigated finding; a mitigation counts only when you record it, with its
-   basis, in the verdict), listing blocking findings first.
+   disposition instead: **DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. A finding its own seat withdrew in round 2, or that the Judge rules refuted on the record, is closed: it is neither mitigated nor unmitigated, it does not block, and the Judge lists it as closed with its basis. List blocking findings first, and every claimed mitigation with its basis. Record every claimed
+   mitigation on the MITIGATIONS: line of the output below — a mitigation
+   recorded anywhere else does not count.
 6. ASSIGN CONFIDENCE using this rubric, quoting the row you matched:
    - high   — seats converged, OR the disagreement was factual and resolved by
               the evidence; the brief's constraints suffice; every failure mode
@@ -458,7 +457,7 @@ Instead:
 Use the same output format as round 1.
 
 Review seats: you have no POSITION — your "position" is your findings set.
-Update your findings instead, mark each one revised or carried, and report
+Update your findings instead, mark each one `[revised]` or `[carried]`, and report
 concessions the same way.
 ```
 

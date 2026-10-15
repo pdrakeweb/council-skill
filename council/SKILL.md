@@ -247,9 +247,10 @@ verbatim round-1 output of every seat, including its own**. A re-spawned seat
 is a fresh context: it does not remember its opening, and a seat that cannot
 see its own words cannot say what moved it. (Only when the harness genuinely
 resumes the same agent instance may its own output be omitted.) Test for the
-exception: if you cannot send a follow-up to a spawned agent and have it
-continue with its context intact, your harness does not resume — include the
-seat's own output. Each must:
+exception on this spawn, not on the harness in general: after you send the
+follow-up, can you verify that this seat's continuation has its own round-1
+output in context — that the same instance resumed, rather than a fresh one
+starting over? If you cannot verify that, include the seat's own output. Each must:
 
 - name at least one **specific** claim from another seat and rebut or concede it,
 - update its POSITION if moved, and say explicitly what moved it,
@@ -279,7 +280,7 @@ The Judge must:
    confident bullet. Note any position that contradicts the evidence pack.
 4. Rule. Pick an option. "It depends" only with the decisive variable named and
    a way to resolve it. **Exception — `review` panel:** there is no option to
-   pick. Rule a disposition instead: **DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. List blocking findings first, and every claimed mitigation with its basis.
+   pick. Rule a disposition instead: **DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. A finding its own seat withdrew in round 2, or that the Judge rules refuted on the record, is closed: it is neither mitigated nor unmitigated, it does not block, and the Judge lists it as closed with its basis. List blocking findings first, and every claimed mitigation with its basis. Record every claimed mitigation on the verdict's `MITIGATIONS:` line (roles.md, Judge output); a mitigation mentioned anywhere else does not count.
 5. Assign confidence from the rubric below — no other basis.
 6. Give one recommended action someone could start on immediately.
 
@@ -362,10 +363,10 @@ COUNCIL_VERDICT: <option> | CONFIDENCE: <high|medium|low>
 COUNCIL_NEEDS: <comma-separated missing facts, or none>
 ```
 
-- A **low**-confidence verdict tells `afk` to escalate and defer, not to
-  proceed cautiously. Say so in the returned block.
+- A **low**-confidence verdict tells `afk` not to proceed: block the item
+  and escalate it in the return briefing. Say so in the returned block.
 - **If the Judge fails** — the spawn errors, returns nothing, or returns
-  output with no VERDICT line — return the seat summaries (the Step 6 seat
+  output with no VERDICT line, or a VERDICT with no CONFIDENCE line — return the seat summaries (the Step 6 seat
   lines, with no verdict block) plus the trailer, emitted mechanically by the
   orchestrator. It is a status line, not a ruling, and the one case where the
   orchestrator may produce it:
@@ -376,7 +377,7 @@ COUNCIL_NEEDS: <the seats' collected NEED: lines, or none>
 ```
 
   `afk` keys on CONFIDENCE: `low` means do not proceed, so `NONE` with `low`
-  fails closed — escalate and defer. The council log entry for the run
+  fails closed: do not proceed — block the item and escalate it in the return briefing. The council log entry for the run
   records `JUDGE FAILURE` and whatever the Judge returned (or "no output"),
   so a `NONE` in the record is auditable.
 - `COUNCIL_NEEDS` becomes the question list in the user's return briefing —
