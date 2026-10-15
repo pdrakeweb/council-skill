@@ -15,6 +15,14 @@ description: >
   decisions that are cheap to reverse, or as a substitute for reading the code
   or running a test — a council debates a judgement call, it does not
   establish a fact.
+when_to_use: >
+  Use on "council this", "convene the council", "debate this", "argue both
+  sides", "red-team this", "stress-test this decision", "get multiple
+  opinions", "what would a skeptic say", or any architectural, strategic, or
+  high-consequence choice — roughly, anything that would earn an ADR. Also
+  invoked by the afk skill for decisions and questions arising while the user
+  is away, and by the android-app-development skill for choices a non-expert
+  user cannot evaluate themselves.
 ---
 
 # Council
@@ -38,8 +46,6 @@ Convene when **at least two** are true:
 - Another skill routed a decision or question here — the `afk` skill for
   decisions arising while the user is away, or the `android-app-development`
   skill for choices a non-expert user cannot evaluate themselves.
-- The user said "council this", "debate this", "red-team this", "stress-test
-  this decision", or words to that effect.
 
 **Do not convene** for questions with a checkable answer (run the test, read
 the code, grep it), for pure preference with no downside, or when speed matters
