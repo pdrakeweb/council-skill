@@ -36,6 +36,11 @@ Both stamps must match or `build.ps1` refuses to package:
 1. `council/SKILL.md` frontmatter → `version: "X.Y.Z"`
 2. `council/VERSION` → `SKILL_VERSION = "X.Y.Z"`
 
+**One bump per release.** Inside a single unreleased PR, fixes to that PR's
+own changes do not bump again — the version is set when the PR is opened and
+the stamps move together at merge. The every-commit rule governs commits
+that land on `main`, not iterations inside one open PR.
+
 - **patch** — wording fixes, role-card tweaks, doc changes
 - **minor** — new flags, new seats, new output fields
 - **major** — breaking changes to the invocation contract, the output block, or
@@ -107,10 +112,22 @@ COUNCIL_VERDICT: <option> | CONFIDENCE: <high|medium|low>
 COUNCIL_NEEDS: <comma-separated missing facts, or none>
 ```
 
+One additive case (0.3.0): if the Judge fails in `afk` mode, the orchestrator
+emits the trailer mechanically with `COUNCIL_VERDICT: NONE | CONFIDENCE: low`
+— a status line, not a ruling. `afk` consumes the trailer by CONFIDENCE, not
+by the verdict token: `low` means do not proceed, so `NONE` paired with `low`
+fails closed (do not proceed — block the item and escalate it in the return briefing). Verified against `afk-skill`'s SKILL.md
+on 2026-10-14; `afk-skill` 0.4.0 names the `NONE` case explicitly.
+
 Changing either line's format is a **major** version bump, and `afk-skill`'s
 SKILL.md must be updated in the same session. Adding a new trailer is additive
-(minor). `afk` treats `low` confidence as "escalate and defer" — if the
+(minor). `afk` treats `low` confidence as "do not proceed: block the item and escalate it in the return briefing" — if the
 confidence vocabulary ever changes, `afk`'s handling of it changes too.
+
+**Ship the pair together.** Companion changes in the two repos merge in the
+same session and are distributed together (both packages rebuilt and
+re-uploaded), so no installed copy consumes a format the other has not
+shipped.
 
 `COUNCIL_NEEDS` becomes the "questions the council couldn't answer" section of
 the user's return briefing, so it must be populated honestly: it is the list of
