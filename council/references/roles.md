@@ -314,6 +314,86 @@ Rules:
 
 ---
 
+# Panel design for other domains
+
+SKILL.md (*Panels → Designing a panel for a new domain*) gives the flow.
+These rosters are starting points for the three jobs the built-in panels do
+not cover. Each line is a seat: name — the job — the failure categories it
+owns. Expand a line into a full card (job, owned categories, rules, output
+contract) before spawning, and log the cards with the run.
+
+## Research and fact-finding
+
+Output contract: claims, not positions. Each seat returns the claims it can
+stand behind, each with its source and date; the claims it could not
+verify; and a NEED line.
+
+- **Source Auditor** — provenance — single-source claims presented as
+  settled, circular reporting (many outlets, one origin), sources that do
+  not say what they are cited for.
+- **Corroboration Checker** — independent confirmation — load-bearing
+  claims resting on one source, numbers without a second measurement,
+  agreement that traces back to the same underlying data.
+- **Contradiction Finder** — conflicting evidence — sources that disagree,
+  cherry-picked ranges, the strongest published case against the emerging
+  consensus.
+- **Recency Auditor** — currency — superseded figures, changed policies,
+  results later corrected or retracted, dates quietly doing the argument's
+  work.
+
+Judge synthesis: a claim list — corroborated / single-source /
+contradicted — with overall confidence set by the weakest load-bearing
+claim.
+
+## Writing and drafting
+
+Output contract: editorial findings, in the findings format — [severity]
+location — problem — effect on the reader — plus CHECKED CLEAN, NEED, and
+CONFIDENCE.
+
+- **Structure Editor** — argument shape — buried lede, sections in the
+  wrong order, claims that arrive before their support, endings that do
+  not land.
+- **Audience Reader** — the intended reader's experience — knowledge the
+  draft assumes and the reader does not have, jargon without payoff, the
+  places a reader stops reading.
+- **Accuracy Checker** — factual content — claims in the draft that are
+  wrong, unverifiable, or stronger than their source; numbers that do not
+  survive arithmetic.
+- **Compression Editor** — length and repetition — the same point made
+  twice, throat-clearing, sentences that carry no information; what to
+  cut, in order.
+
+Judge synthesis: an editorial ruling — accept, revise (with the revision
+list, in priority order), or reject.
+
+## Grading and scoring
+
+Run round 1 blind: seats score independently and do not see each other's
+scores until round 2. Anchoring is the failure this panel exists to avoid,
+and a shared round 1 manufactures it.
+
+Output contract: per criterion — a score, the evidence in the work the
+score rests on (quoted), and a NEED line.
+
+- **Rubric Literalist** — the rubric as written — criteria scored on what
+  the rubric says, not on what the work feels like; every score tied to
+  quoted evidence.
+- **Calibration Reviewer** — standards — scores checked against exemplars
+  and the cohort's range; inflation and deflation; a score that would not
+  survive comparison with the anchor work.
+- **Consistency Auditor** — even application — the same standard applied
+  to every submission; halo and horns effects; a defect penalized twice.
+- **Feedback Reviewer** — the comments — feedback that is specific,
+  evidenced, and actionable by the person graded; comments that grade the
+  person instead of the work.
+
+Judge synthesis: one score per criterion, each resting on quoted evidence.
+Where seats diverge widely on a criterion, the Judge rules from the cited
+evidence — never by averaging the scores away.
+
+---
+
 # The Researcher
 
 Runs **before** the debaters, serially. Not a debater — it takes no position.
