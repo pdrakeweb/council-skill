@@ -1,6 +1,6 @@
 ---
 name: "council"
-version: "0.3.0"
+version: "0.4.0"
 license: MIT
 description: >
   Convene a council of sub-agents that debate a hard question across multiple
@@ -122,6 +122,51 @@ rewrite it before spawning and note the rewrite in the log.
 
 More seats is not better. Five seats on a question with two real options mostly
 produces restatement. Prefer `classic` and spend the tokens on `--rounds 3`.
+
+### Designing a panel for a new domain
+
+The built-in panels cover decisions (`classic`), reframing (`dmad`), and
+artifact review (`review`). Councils are also useful for research and
+fact-finding, drafting and editing, and grading or scoring work — jobs none
+of the three fits. When the question fits none of them, design a panel
+instead of forcing one:
+
+1. **Name the job.** One of: decide between options, find and verify facts,
+   produce or improve a draft, or score work against a standard. The job
+   picks the output contract: the debater contract for decisions, the
+   findings contract for review. For the other jobs, write the contract
+   before the cards (step 4) — a panel whose seats return incompatible
+   shapes cannot be judged.
+2. **List how the work can be wrong.** Four to six failure modes specific to
+   the domain, not generic risks. Fact-finding: a single source repeated as
+   corroboration, stale figures, a primary source nobody read. Grading:
+   rubric drift, halo effects, criteria applied unevenly. Each seat will
+   own one.
+3. **Assign one seat per failure mode that can change the outcome.** Three
+   to five seats. If two candidate seats would catch the same failures,
+   merge them. If a failure mode that matters has no seat, name it in the
+   Judge's brief as a known gap — or the panel is not ready.
+4. **Write each card in the roles.md format** — a one-line job, the
+   categories it owns and no others, rules, and the output contract from
+   step 1. The custom-seat rules apply: a card assigns a failure category
+   or a stance to test, never a conclusion. Every card gives its seat a way
+   to report "nothing found" in its category — the equivalent of
+   CHECKED CLEAN — and a NEED line.
+5. **Set the Judge's synthesis to match the job.** Decide: verdict +
+   confidence, as usual. Verify facts: a consolidated claim list, each
+   claim marked corroborated / single-source / contradicted, with
+   confidence set by the weakest load-bearing claim. Draft: an editorial
+   ruling — accept, revise (with the revision list), or reject — never a
+   merged average of the seats' styles. Grade: one score per criterion,
+   each resting on evidence quoted from the work; where seats diverge
+   widely on a criterion, the Judge rules from the cited evidence, never
+   by averaging.
+
+Example rosters for research, writing, and grading are in
+`references/roles.md`, under *Panel design for other domains* — one-line
+jobs and owned categories per seat. Expand a roster line into a full card
+(step 4) before spawning, and log the design — job, failure modes, cards —
+with the council log entry, as with improvised seats.
 
 ## Research phase
 
