@@ -198,7 +198,10 @@ propagates everywhere, and a local backup is the fast way back. Override with
 
 For web and mobile, upload `council.skill` via **Settings → Capabilities →
 Skills** — that creates an account-synced copy which then takes precedence over
-local files everywhere, including desktop.
+local files everywhere, including desktop. Rolling back works the same way in
+reverse: rebuild the older version and re-upload or re-deploy it — an
+account-synced copy does not follow the repo on its own, so a repo revert
+alone does not recall a bad release.
 
 ## Honest limitation
 

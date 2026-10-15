@@ -32,9 +32,10 @@ supplying it. A NEED: line costs nothing; an invented fact poisons the verdict.
 **Custom seats:** names resolve case-insensitively against the cards below,
 including the aliases `security` → Security Auditor, `correctness` →
 Correctness Hawk, `feasibility` → Feasibility Analyst, `clarity` → Clarity
-Editor. For a name with no card, the orchestrator writes one in this format —
-a one-line job, rules, and the shared output contract above — before spawning,
-and includes the card text in the council log entry.
+Editor. The rest of the custom-seat rules — which output contract a seat
+uses, the configuration-line form, and how improvised cards are written and
+logged — are stated in SKILL.md, *Panels → Custom seats*, and only there, so
+the two documents cannot drift.
 
 ---
 
@@ -227,10 +228,8 @@ NEED: <facts you lacked, or "none">
 CONFIDENCE: high | medium | low
 ```
 
-The Judge does not pick an option for a review panel. It rules a disposition —
-**DO NOT SHIP** if any critical or high finding is unmitigated, **SHIP WITH
-FIXES** if the worst unmitigated finding is medium or low, **SHIP** if there
-are no findings — and lists blocking findings first.
+The Judge does not pick an option for a review panel. It rules a disposition:
+**DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. List blocking findings first, and every claimed mitigation with its basis.
 
 ## Security Auditor
 
@@ -387,9 +386,10 @@ Do this in order:
    verdict" list.
 5. RULE. Pick an option. "It depends" is acceptable ONLY if you name the
    decisive variable and how to resolve it. EXCEPTION — review panel: rule a
-   disposition instead (DO NOT SHIP if any critical/high finding is
-   unmitigated; SHIP WITH FIXES if the worst unmitigated finding is medium or
-   low; SHIP if none), listing blocking findings first.
+   disposition instead, using the disposition rule stated in the review panel
+   section of this file (DO NOT SHIP / SHIP WITH FIXES / SHIP by worst
+   unmitigated finding; a mitigation counts only when you record it, with its
+   basis, in the verdict), listing blocking findings first.
 6. ASSIGN CONFIDENCE using this rubric, quoting the row you matched:
    - high   — seats converged, OR the disagreement was factual and resolved by
               the evidence; the brief's constraints suffice; every failure mode
@@ -422,6 +422,7 @@ FACTUAL vs VALUE: <classification, briefly>
 EVIDENCE WEIGHT: <which positions the evidence supports or contradicts, or "no evidence pack">
 OPEN NEEDS: <collected NEED: lines, or "none">
 VERDICT: <the ruling, 2-4 sentences>
+MITIGATIONS: <review panels: each mitigated finding + its basis, or "none">
 CONFIDENCE: HIGH | MEDIUM | LOW — <the rubric row you matched>
 RECOMMENDED ACTION: <one concrete step>
 WOULD CHANGE THIS VERDICT: <fact or event>
@@ -440,8 +441,9 @@ remember its opening. Omit a seat's own output only when the harness resumes
 the same agent instance:
 
 ```
-ROUND 2 — CROSS-EXAMINATION. Below is what the other seats argued. You may not
-restate your opening. Instead:
+ROUND 2 — CROSS-EXAMINATION. Below is what the seats argued in round 1 —
+every seat's opening, including your own. You may not restate your opening.
+Instead:
 
 - Name at least one SPECIFIC claim from another seat — quote it — and either
   rebut it (say why it fails) or concede it (say so plainly; conceding is a
@@ -454,6 +456,10 @@ restate your opening. Instead:
 - Do not manufacture disagreement to look rigorous.
 
 Use the same output format as round 1.
+
+Review seats: you have no POSITION — your "position" is your findings set.
+Update your findings instead, mark each one revised or carried, and report
+concessions the same way.
 ```
 
 ## Round 3 — closings (only with `--rounds 3`)

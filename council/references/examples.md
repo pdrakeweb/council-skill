@@ -186,10 +186,35 @@ HOLLOW SELF-COUNTERS: none — all three named real weaknesses.
 ## Step 6 — Report
 
 The report to the user is the Step 6 verdict block assembled from the Judge's
-output above: one line per seat, the round-2 movement (here: none — round 2
-did not run), the open NEED, then the verdict, recommended action, and
-would-change lines. It is not reproduced here; the Judge's output is its
-source.
+output above:
+
+```markdown
+## Council verdict — Migrate background jobs off Celery to pgmq, SQS, or stay?
+`panel: classic · rounds: 1 · research: skipped — internal facts`
+
+**Advocate** (medium): Option B — pgmq inside the existing Postgres;
+transactional enqueue ends the lost-task incident class, and retiring Redis
+is a bonus.
+**Skeptic** (high): None of the three options yet — Postgres headroom is
+unvalidated and `acks_late=True` was never tried; the migration is being
+costed as if it were free.
+**Pragmatist** (high): Option B as a strangler — move the 3 incident jobs,
+leave the other 37 on Celery; Option C is out on staffing and compliance.
+
+**Round 2 movement:** none — round 2 did not run
+**Open questions:** the current `acks_late` setting in the Celery config (Skeptic)
+
+### Verdict — confidence: MEDIUM
+Move the 3 incident-implicated job types to pgmq; do not migrate the other
+37 on this evidence. Check `acks_late` first — if it is untried, the cheap
+fix has not been ruled out and even the 3-job migration may be unnecessary.
+
+**Recommended action:** Read the two incident postmortems and the current
+Celery `acks_late` setting today; if untried, fix the config and re-evaluate
+in 30 days.
+**Would change this verdict:** `acks_late` already on and incidents persist →
+migrate the 3 jobs now. Staging headroom below 10% → pgmq is off the table.
+```
 
 ## Step 7 — Log entry
 

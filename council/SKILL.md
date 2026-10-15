@@ -73,10 +73,11 @@ trivial question burns tokens and buries the real answer.
 Anything not recognized as a flag is the question. If no question is present,
 ask for one — never invent it.
 
-**Cost envelope.** A run costs 1 optional Researcher + (seats × rounds) + 1
-Judge agent invocations: classic at the default 2 rounds is 7, dmad at 3
-rounds is 16, plus the Researcher when research runs. If the stakes do not
-justify that spend, do not convene — answer directly and say why.
+**Cost envelope.** A run costs (seats × rounds) + 1 Judge invocation, plus 1
+Researcher when the research phase runs: classic at the default 2 rounds is
+7, or 8 with research; dmad at 3 rounds is 16, or 17 with research. If the
+stakes do not justify that spend, do not convene — answer directly and say
+why.
 
 ## Panels
 
@@ -105,6 +106,19 @@ one before spawning, in the roles.md format (a one-line job, rules, and the
 shared output contract), names it in the configuration line, and includes the
 card text in the log entry — an improvised card is part of the record, not a
 silent invention.
+
+The output contract follows the panel, not the card: in a `review` panel
+every seat uses the findings contract; in any other panel every seat —
+including an aliased review seat — uses the shared debater contract, arguing
+from its card's categories as its lens.
+
+Configuration line for a custom panel: `panel: custom (seats: <names>) ·
+rounds: <n> · research: <...>`. Mark each improvised seat with `*` in the
+line, and beside its card in the log.
+
+An improvised card must assign a failure category or a stance to test —
+never a conclusion to reach. If a card as drafted presupposes the answer,
+rewrite it before spawning and note the rewrite in the log.
 
 More seats is not better. Five seats on a question with two real options mostly
 produces restatement. Prefer `classic` and spend the tokens on `--rounds 3`.
@@ -232,7 +246,10 @@ Re-spawn every seat in parallel. Each now receives the brief **plus the
 verbatim round-1 output of every seat, including its own**. A re-spawned seat
 is a fresh context: it does not remember its opening, and a seat that cannot
 see its own words cannot say what moved it. (Only when the harness genuinely
-resumes the same agent instance may its own output be omitted.) Each must:
+resumes the same agent instance may its own output be omitted.) Test for the
+exception: if you cannot send a follow-up to a spawned agent and have it
+continue with its context intact, your harness does not resume — include the
+seat's own output. Each must:
 
 - name at least one **specific** claim from another seat and rebut or concede it,
 - update its POSITION if moved, and say explicitly what moved it,
@@ -262,10 +279,7 @@ The Judge must:
    confident bullet. Note any position that contradicts the evidence pack.
 4. Rule. Pick an option. "It depends" only with the decisive variable named and
    a way to resolve it. **Exception — `review` panel:** there is no option to
-   pick. Rule a disposition instead: **DO NOT SHIP** if any critical or high
-   finding is unmitigated, **SHIP WITH FIXES** if the worst unmitigated finding
-   is medium or low, **SHIP** if there are no findings. List blocking findings
-   first.
+   pick. Rule a disposition instead: **DO NOT SHIP** if any critical or high finding is unmitigated; **SHIP WITH FIXES** if the worst unmitigated finding is medium or low; **SHIP** if there are no unmitigated findings. A finding is mitigated only when the Judge names the specific mitigation in the verdict — a constraint in the brief, a countermeasure in the artifact, or a round-2 concession that removes the mechanism. An unrecorded mitigation does not count. List blocking findings first, and every claimed mitigation with its basis.
 5. Assign confidence from the rubric below — no other basis.
 6. Give one recommended action someone could start on immediately.
 
@@ -304,7 +318,8 @@ With `--quiet`, print only from `### Verdict` down.
 
 For a `review` panel, the per-seat lines carry finding counts by severity
 instead of positions, and the `### Verdict` block carries the disposition
-(SHIP / SHIP WITH FIXES / DO NOT SHIP) with the blocking findings named.
+(SHIP / SHIP WITH FIXES / DO NOT SHIP) with the blocking findings named and
+every mitigation the Judge recorded, with its basis.
 
 ### Step 7 — Log
 
@@ -349,16 +364,21 @@ COUNCIL_NEEDS: <comma-separated missing facts, or none>
 
 - A **low**-confidence verdict tells `afk` to escalate and defer, not to
   proceed cautiously. Say so in the returned block.
-- **If the Judge fails**, the orchestrator emits the trailer mechanically — it
-  is a status line, not a ruling, and the one case where the orchestrator may
-  produce it:
+- **If the Judge fails** — the spawn errors, returns nothing, or returns
+  output with no VERDICT line — return the seat summaries (the Step 6 seat
+  lines, with no verdict block) plus the trailer, emitted mechanically by the
+  orchestrator. It is a status line, not a ruling, and the one case where the
+  orchestrator may produce it:
 
 ```
 COUNCIL_VERDICT: NONE | CONFIDENCE: low
 COUNCIL_NEEDS: <the seats' collected NEED: lines, or none>
 ```
 
-  `afk` treats `NONE` like `low`: escalate and defer.
+  `afk` keys on CONFIDENCE: `low` means do not proceed, so `NONE` with `low`
+  fails closed — escalate and defer. The council log entry for the run
+  records `JUDGE FAILURE` and whatever the Judge returned (or "no output"),
+  so a `NONE` in the record is auditable.
 - `COUNCIL_NEEDS` becomes the question list in the user's return briefing —
   these are precisely the things worth their attention.
 
@@ -398,7 +418,9 @@ Also worth naming when they apply:
   `### Verdict — confidence: LOW (judge unavailable)`. A missing Judge is not
   licence to rule from your own context, which is exactly the bias the Judge's
   clean context exists to avoid. In `afk` mode, also emit the `NONE` trailer
-  described under **Being called by the `afk` skill**.
+  described under **Being called by the `afk` skill**. Either way, the log
+  entry records `JUDGE FAILURE` and whatever the Judge returned (or "no
+  output").
 - **The Researcher fails or has no web access** — continue without it, mark the
   verdict `research: unavailable`, and cap confidence at **medium** if the
   question was one the heuristics said needed research. Do not let debaters
