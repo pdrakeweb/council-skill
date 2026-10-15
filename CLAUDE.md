@@ -107,6 +107,11 @@ COUNCIL_VERDICT: <option> | CONFIDENCE: <high|medium|low>
 COUNCIL_NEEDS: <comma-separated missing facts, or none>
 ```
 
+One additive case (0.3.0): if the Judge fails in `afk` mode, the orchestrator
+emits the trailer mechanically with `COUNCIL_VERDICT: NONE | CONFIDENCE: low`
+— a status line, not a ruling — and `afk` treats `NONE` like `low` (escalate
+and defer).
+
 Changing either line's format is a **major** version bump, and `afk-skill`'s
 SKILL.md must be updated in the same session. Adding a new trailer is additive
 (minor). `afk` treats `low` confidence as "escalate and defer" — if the

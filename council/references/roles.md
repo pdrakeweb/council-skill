@@ -13,6 +13,7 @@ REASONING:
 - <claim + why it holds>
 - <3-6 bullets total>
 STRONGEST COUNTER TO MY OWN VIEW: <one bullet>
+WOULD CHANGE MY MIND: <the evidence that would move you — mandatory for the Skeptic; other seats: state it or "n/a">
 NEED: <facts you lacked and could not get from the brief or evidence pack, or "none">
 CONFIDENCE: high | medium | low
 ```
@@ -27,6 +28,13 @@ INADMISSIBLE — it is exactly the failure this council exists to prevent. If yo
 need a fact that is not present, write it on the NEED: line instead of
 supplying it. A NEED: line costs nothing; an invented fact poisons the verdict.
 ```
+
+**Custom seats:** names resolve case-insensitively against the cards below,
+including the aliases `security` → Security Auditor, `correctness` →
+Correctness Hawk, `feasibility` → Feasibility Analyst, `clarity` → Clarity
+Editor. For a name with no card, the orchestrator writes one in this format —
+a one-line job, rules, and the shared output contract above — before spawning,
+and includes the card text in the council log entry.
 
 ---
 
@@ -207,6 +215,23 @@ Four failure categories over a concrete artifact (a diff, a plan, a design
 doc). Produces a **findings list**, not a decision. Inspired by
 [wan-huiyan/agent-review-panel](https://github.com/wan-huiyan/agent-review-panel).
 
+Review seats use this output contract **instead of** the shared debater
+contract above:
+
+```
+FINDINGS:
+- [critical|high|medium|low] <location> — <mechanism or triggering input> — <effect>
+- <one line per finding; "none" if the seat found nothing>
+CHECKED CLEAN: <categories examined with no finding — required; a silent seat is indistinguishable from an absent one>
+NEED: <facts you lacked, or "none">
+CONFIDENCE: high | medium | low
+```
+
+The Judge does not pick an option for a review panel. It rules a disposition —
+**DO NOT SHIP** if any critical or high finding is unmitigated, **SHIP WITH
+FIXES** if the worst unmitigated finding is medium or low, **SHIP** if there
+are no findings — and lists blocking findings first.
+
 ## Security Auditor
 
 ```
@@ -361,7 +386,10 @@ Do this in order:
    lacked. They feed both the confidence level and the "would change this
    verdict" list.
 5. RULE. Pick an option. "It depends" is acceptable ONLY if you name the
-   decisive variable and how to resolve it.
+   decisive variable and how to resolve it. EXCEPTION — review panel: rule a
+   disposition instead (DO NOT SHIP if any critical/high finding is
+   unmitigated; SHIP WITH FIXES if the worst unmitigated finding is medium or
+   low; SHIP if none), listing blocking findings first.
 6. ASSIGN CONFIDENCE using this rubric, quoting the row you matched:
    - high   — seats converged, OR the disagreement was factual and resolved by
               the evidence; the brief's constraints suffice; every failure mode
@@ -407,7 +435,9 @@ HOLLOW SELF-COUNTERS: <seat names, or "none">
 ## Round 2 — cross-examination (runs by default)
 
 Append to each seat's card, followed by the **verbatim round-1 output of every
-other seat** (never its own):
+seat, including its own** — a re-spawned seat is a fresh context and does not
+remember its opening. Omit a seat's own output only when the harness resumes
+the same agent instance:
 
 ```
 ROUND 2 — CROSS-EXAMINATION. Below is what the other seats argued. You may not

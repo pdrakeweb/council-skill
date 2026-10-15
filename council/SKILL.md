@@ -1,6 +1,6 @@
 ---
 name: "council"
-version: "0.2.1"
+version: "0.3.0"
 license: MIT
 description: >
   Convene a council of sub-agents that debate a hard question across multiple
@@ -15,14 +15,6 @@ description: >
   decisions that are cheap to reverse, or as a substitute for reading the code
   or running a test — a council debates a judgement call, it does not
   establish a fact.
-when_to_use: >
-  Use on "council this", "convene the council", "debate this", "argue both
-  sides", "red-team this", "stress-test this decision", "get multiple
-  opinions", "what would a skeptic say", or any architectural, strategic, or
-  high-consequence choice — roughly, anything that would earn an ADR. Also
-  invoked by the afk skill for decisions and questions arising while the user
-  is away, and by the android-app-development skill for choices a non-expert
-  user cannot evaluate themselves.
 ---
 
 # Council
@@ -43,7 +35,11 @@ Convene when **at least two** are true:
 - Reasonable experts would disagree.
 - You notice yourself pattern-matching to the first plausible answer.
 - The user asked for a debate, red-team, or second opinion.
-- The `afk` skill routed a decision or question here.
+- Another skill routed a decision or question here — the `afk` skill for
+  decisions arising while the user is away, or the `android-app-development`
+  skill for choices a non-expert user cannot evaluate themselves.
+- The user said "council this", "debate this", "red-team this", "stress-test
+  this decision", or words to that effect.
 
 **Do not convene** for questions with a checkable answer (run the test, read
 the code, grep it), for pure preference with no downside, or when speed matters
@@ -65,11 +61,16 @@ trivial question burns tokens and buries the real answer.
 | `--panel <name>` | `classic` | Which seats debate. See **Panels** below. |
 | `--rounds N` | **2** | 1 = openings only. 2 = openings + cross-examination. 3 = adds closing statements. Max 3. |
 | `--research` / `--no-research` | auto | Force or suppress the web-research phase (see **Research phase**). |
-| `--seats "a,b,c"` | — | Custom seat list, overriding `--panel`. 2–6 seats. |
+| `--seats "a,b,c"` | — | Custom seat list, overriding `--panel`. 2–6 seats. Names resolve against `references/roles.md` (see **Custom seats** below). |
 | `--quiet` | off | Print the verdict block only. The log still records everything. |
 
 Anything not recognized as a flag is the question. If no question is present,
 ask for one — never invent it.
+
+**Cost envelope.** A run costs 1 optional Researcher + (seats × rounds) + 1
+Judge agent invocations: classic at the default 2 rounds is 7, dmad at 3
+rounds is 16, plus the Researcher when research runs. If the stakes do not
+justify that spend, do not convene — answer directly and say why.
 
 ## Panels
 
@@ -87,6 +88,17 @@ line before spawning.
 Panel choice is a real fork: `classic` produces a **decision**, `dmad` produces
 a **reframing**, `review` produces a **findings list**. Choosing `review` for a
 "should we?" question yields four critiques and no answer.
+
+### Custom seats
+
+Seat names resolve case-insensitively against the cards in
+`references/roles.md`, including these aliases: `security` → Security Auditor,
+`correctness` → Correctness Hawk, `feasibility` → Feasibility Analyst,
+`clarity` → Clarity Editor. For a name with no card, the orchestrator writes
+one before spawning, in the roles.md format (a one-line job, rules, and the
+shared output contract), names it in the configuration line, and includes the
+card text in the log entry — an improvised card is part of the record, not a
+silent invention.
 
 More seats is not better. Five seats on a question with two real options mostly
 produces restatement. Prefer `classic` and spend the tokens on `--rounds 3`.
@@ -199,6 +211,7 @@ Each returns:
 POSITION: <one sentence>
 REASONING: <3-6 bullets, each a claim + why it holds>
 STRONGEST COUNTER TO MY OWN VIEW: <one bullet — mandatory>
+WOULD CHANGE MY MIND: <the evidence that would move you — mandatory for the Skeptic; other seats: state it or "n/a">
 NEED: <facts I lacked, or "none">
 CONFIDENCE: high | medium | low
 ```
@@ -210,8 +223,10 @@ self-counter is reported and that seat is discounted.
 ### Step 3 — Round 2, cross-examination (default)
 
 Re-spawn every seat in parallel. Each now receives the brief **plus the
-verbatim round-1 output of every other seat** — not its own, which it already
-holds and which re-reading only entrenches. Each must:
+verbatim round-1 output of every seat, including its own**. A re-spawned seat
+is a fresh context: it does not remember its opening, and a seat that cannot
+see its own words cannot say what moved it. (Only when the harness genuinely
+resumes the same agent instance may its own output be omitted.) Each must:
 
 - name at least one **specific** claim from another seat and rebut or concede it,
 - update its POSITION if moved, and say explicitly what moved it,
@@ -240,7 +255,11 @@ The Judge must:
 3. Weigh **sourced evidence above debater assertion.** A cited finding beats a
    confident bullet. Note any position that contradicts the evidence pack.
 4. Rule. Pick an option. "It depends" only with the decisive variable named and
-   a way to resolve it.
+   a way to resolve it. **Exception — `review` panel:** there is no option to
+   pick. Rule a disposition instead: **DO NOT SHIP** if any critical or high
+   finding is unmitigated, **SHIP WITH FIXES** if the worst unmitigated finding
+   is medium or low, **SHIP** if there are no findings. List blocking findings
+   first.
 5. Assign confidence from the rubric below — no other basis.
 6. Give one recommended action someone could start on immediately.
 
@@ -276,6 +295,10 @@ missing fact is more useful than a `high` verdict that is wrong.
 ```
 
 With `--quiet`, print only from `### Verdict` down.
+
+For a `review` panel, the per-seat lines carry finding counts by severity
+instead of positions, and the `### Verdict` block carries the disposition
+(SHIP / SHIP WITH FIXES / DO NOT SHIP) with the blocking findings named.
 
 ### Step 7 — Log
 
@@ -320,6 +343,16 @@ COUNCIL_NEEDS: <comma-separated missing facts, or none>
 
 - A **low**-confidence verdict tells `afk` to escalate and defer, not to
   proceed cautiously. Say so in the returned block.
+- **If the Judge fails**, the orchestrator emits the trailer mechanically — it
+  is a status line, not a ruling, and the one case where the orchestrator may
+  produce it:
+
+```
+COUNCIL_VERDICT: NONE | CONFIDENCE: low
+COUNCIL_NEEDS: <the seats' collected NEED: lines, or none>
+```
+
+  `afk` treats `NONE` like `low`: escalate and defer.
 - `COUNCIL_NEEDS` becomes the question list in the user's return briefing —
   these are precisely the things worth their attention.
 
@@ -358,7 +391,8 @@ Also worth naming when they apply:
 - **The Judge fails** — print the seat summaries and stop at
   `### Verdict — confidence: LOW (judge unavailable)`. A missing Judge is not
   licence to rule from your own context, which is exactly the bias the Judge's
-  clean context exists to avoid.
+  clean context exists to avoid. In `afk` mode, also emit the `NONE` trailer
+  described under **Being called by the `afk` skill**.
 - **The Researcher fails or has no web access** — continue without it, mark the
   verdict `research: unavailable`, and cap confidence at **medium** if the
   question was one the heuristics said needed research. Do not let debaters

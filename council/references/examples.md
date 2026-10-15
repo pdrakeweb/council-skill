@@ -47,7 +47,7 @@ CONSTRAINTS (facts, not preferences)
 Note what is *not* in the brief: any hint that the session already leaned
 toward pgmq. That omission is the whole point.
 
-## Step 1 — Debaters (parallel, clean contexts)
+## Step 2 — Openings (parallel, clean contexts)
 
 **Advocate** returned:
 
@@ -65,6 +65,9 @@ REASONING:
   SKIP LOCKED read, not a new engine.
 STRONGEST COUNTER TO MY OWN VIEW: 40 job types means 40 migrations, and a
 half-migrated system runs two queues at once — the riskiest state of all.
+WOULD CHANGE MY MIND: evidence that per-type migration is impractical (shared
+task code across types), which would force an all-at-once cutover.
+NEED: none
 CONFIDENCE: medium
 ```
 
@@ -88,8 +91,10 @@ REASONING:
 STRONGEST COUNTER TO MY OWN VIEW: if the team genuinely cannot operate Redis
 well — and two incidents suggest that — then "fix the config" keeps them on a
 system they have already proven they mismanage.
-EVIDENCE THAT WOULD CHANGE MY MIND: a staging run of pgmq at 2M jobs/day
-showing Postgres CPU staying above 15% headroom.
+WOULD CHANGE MY MIND: a staging run of pgmq at 2M jobs/day showing Postgres
+CPU staying above 15% headroom.
+NEED: the current `acks_late` setting in the Celery config — nobody has
+established whether it is already on.
 CONFIDENCE: high
 ```
 
@@ -112,10 +117,13 @@ REASONING:
 STRONGEST COUNTER TO MY OWN VIEW: running two queue systems permanently is a
 real ongoing tax, and "temporary" dual-stacks have a way of becoming the
 architecture.
+WOULD CHANGE MY MIND: a hard deadline appearing — a strangler needs calendar
+room a deadline would remove.
+NEED: none
 CONFIDENCE: high
 ```
 
-## Step 3 — Judge
+## Step 5 — Judge
 
 ```
 REAL DISAGREEMENT: Not whether pgmq is durable — all three accept that — but
@@ -126,6 +134,12 @@ the lost-task incidents (check: read the incident postmortems and the current
 Celery config)? FACTUAL: does Postgres hold headroom under queue load (check:
 staging run at production volume). VALUE: tolerance for permanently running
 two queue systems versus tolerance for a long migration window.
+
+EVIDENCE WEIGHT: no evidence pack — research skipped; all claims rest on the
+brief's stated facts.
+
+OPEN NEEDS: the current `acks_late` setting (Skeptic) — resolvable by reading
+the config, named in the verdict as the first check.
 
 VERDICT: Move the 3 incident-implicated job types to pgmq; do not migrate the
 other 37 on this evidence. The Pragmatist's strangler and the Advocate's
@@ -153,15 +167,16 @@ table entirely, revisit C despite the staffing cost).
 HOLLOW SELF-COUNTERS: none — all three named real weaknesses.
 ```
 
-## Step 5 — Log entry
+## Step 7 — Log entry
 
 ```markdown
 ## 14:32 — Migrate background jobs off Celery to pgmq, SQS, or stay?
-- **Rounds:** 1
+- **Config:** panel classic · rounds 1 · research skipped
 - **Invoked by:** user
 - **Brief:** 3 options (Celery / pgmq / SQS); 4 engineers, no SQS experience;
   2M jobs/day, p99 30s; 2 lost-task incidents in 6mo; PII must stay in VPC;
   Postgres at 20% CPU headroom; no deadline.
+- **Evidence:** none — research skipped (question turned on internal facts).
 - **Advocate:** B (pgmq) (medium) — transactional enqueue removes the
   lost-task mechanism; drops Redis; PII stays in VPC.
 - **Skeptic:** headroom assumption unvalidated (high) — queue load measured
@@ -170,6 +185,8 @@ HOLLOW SELF-COUNTERS: none — all three named real weaknesses.
 - **Pragmatist:** B as a strangler, 3 jobs not 40 (high) — 40-type migration
   is a months-long dual-queue window; C blocked on staffing + compliance.
 - **Round 2 movement:** n/a
+- **Open questions (NEED):** current `acks_late` setting in the Celery config
+  (Skeptic) — no seat could establish it from the brief.
 - **Verdict:** Migrate the 3 incident-implicated jobs only; check `acks_late`
   first — confidence **MEDIUM**
 - **Recommended action:** Read the 2 postmortems + current `acks_late` config
